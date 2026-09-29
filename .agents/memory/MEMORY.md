@@ -6,7 +6,7 @@
 - [Browser focus-visible checks](browser-focus-visible-checks.md) — verify keyboard-only states with real Tab input, not synthetic `.focus()` calls.
 - [Light-mode work labels](light-mode-work-labels.md) — use an opaque pale-lavender silhouette with dark violet text; translucent overlays were rejected for readability.
 - [Origin-based overlays](origin-based-overlays.md) — card previews should center while expanding from the clicked card and close immediately on backdrop pointer-down.
-- [GitHub connector publishing](github-connector-publishing.md) — when HTTPS git auth is unavailable, publish the verified tree through the connected GitHub API.
+- [GitHub connector publishing](github-connector-publishing.md) — verify Git and LFS objects, seed empty repos before Git Data writes, and advance only a verified tree.
 - [Contact route parity](contact-route-parity.md) — Vercel serverless routes do not serve Replit's local API preview; keep both entry points on one handler.
 - [Footer logo flex sizing](footer-logo-flex-sizing.md) — constrain logo-brand flex basis so intrinsic image width can't squeeze the footer links grid.
 - [Hero client logo alignment](hero-client-logo-alignment.md) — hero-only alpha-trimmed copies center visible artwork without changing shared client logos.

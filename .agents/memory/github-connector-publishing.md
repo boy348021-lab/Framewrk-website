@@ -45,6 +45,18 @@ The GitHub Git Blobs API can reject large base64 uploads with a 422 size error e
 
 **How to apply:** Verify large files are needed, do not move the branch ref until every required blob is available, and never silently omit a referenced asset. If a required blob exceeds the API limit, use another upload route or ask the user how to proceed.
 
+Git LFS-managed files have two different representations: the worktree contains the expanded media, while the Git tree stores a small pointer blob. Uploading that pointer does not upload the LFS payload.
+
+**Why:** A tree can match its expected Git SHA while clones or deployments still lack the referenced media.
+
+**How to apply:** Inspect `.gitattributes` and `git lfs ls-files` before publishing. Confirm each LFS object is present in the destination's LFS storage or get the user's approval to omit that path; never hash the expanded worktree bytes as if they were the Git pointer.
+
+Git Data API writes can return 409 when the remote repository has no commit. Initialize the default branch with a real tracked project file through the Contents API, then add the verified full tree in a normal fast-forward commit.
+
+**Why:** An empty repository may reject blob creation before any tree or commit can be assembled.
+
+**How to apply:** Verify the seeded ref, include that file in the final tree, and update the branch only after all required blobs and tree entries match the local snapshot.
+
 An API-based update to the linked GitHub branch can trigger Vercel's automatic production deployment. Check for the exact commit in a READY production deployment before attempting a separate Vercel deployment.
 
 **Why:** The connected Vercel project built the API-published commit automatically; a manual deployment would have duplicated that work.
