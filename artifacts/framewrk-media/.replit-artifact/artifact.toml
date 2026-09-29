@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "FrameWrk Media"
+description = "A motion-led portfolio website for FrameWrk Media, a creative media house working across branding, social, content production, and digital experiences."
+version = "1.0.0"
+id = "artifacts/framewrk-media"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25801
+
+[services.development]
+run = "pnpm --filter @workspace/framewrk-media run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/framewrk-media", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/framewrk-media/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25801"
+BASE_PATH = "/"

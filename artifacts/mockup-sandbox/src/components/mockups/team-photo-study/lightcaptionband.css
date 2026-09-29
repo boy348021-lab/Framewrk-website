@@ -1,0 +1,225 @@
+.light-caption {
+  --lc-paper: #f2f0e9;
+  --lc-band: #fbfaf6;
+  --lc-ink: #282b2a;
+  --lc-muted: #777970;
+  --lc-rule: #d9d8cf;
+  --lc-accent: #697664;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--lc-paper);
+  color: var(--lc-ink);
+  font-family: "DM Sans", "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.light-caption *,
+.light-caption *::before,
+.light-caption *::after {
+  box-sizing: border-box;
+}
+
+.light-caption__masthead {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 clamp(20px, 4vw, 64px);
+  animation: lc-arrive 640ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.light-caption__mark {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: var(--lc-accent);
+}
+
+.light-caption__eyebrow,
+.light-caption__edition {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.light-caption__edition {
+  margin-left: auto;
+  color: var(--lc-muted);
+  text-align: right;
+}
+
+.light-caption__figure {
+  margin: 0;
+  animation: lc-arrive 760ms 70ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.light-caption__photo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.light-caption__band {
+  display: grid;
+  grid-template-columns: minmax(190px, .68fr) minmax(0, 2.32fr);
+  align-items: stretch;
+  background: var(--lc-band);
+  border-bottom: 1px solid var(--lc-rule);
+  box-shadow: 0 7px 18px rgba(45, 46, 39, .035);
+}
+
+.light-caption__intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 23px clamp(22px, 4vw, 64px);
+  border-right: 1px solid var(--lc-rule);
+}
+
+.light-caption__label {
+  color: var(--lc-accent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.light-caption__note {
+  color: #696b65;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.light-caption__profiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.light-caption__person {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: clamp(11px, 2vw, 27px);
+  padding: 21px clamp(16px, 3vw, 46px);
+}
+
+.light-caption__person + .light-caption__person {
+  border-left: 1px solid var(--lc-rule);
+}
+
+.light-caption__index {
+  align-self: flex-start;
+  padding-top: 5px;
+  color: #8b8d84;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.light-caption__identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.light-caption__identity h2 {
+  margin: 0;
+  color: var(--lc-ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: clamp(22px, 3vw, 36px);
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.light-caption__identity p {
+  margin: 8px 0 0;
+  color: var(--lc-muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .095em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.light-caption__arrow {
+  align-self: flex-start;
+  color: var(--lc-accent);
+  font-size: 15px;
+}
+
+.light-caption__tail {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px clamp(20px, 4vw, 64px);
+  color: #65675f;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+@keyframes lc-arrive {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .light-caption__masthead {
+    min-height: 58px;
+    gap: 9px;
+  }
+
+  .light-caption__eyebrow,
+  .light-caption__edition {
+    font-size: 8px;
+    letter-spacing: .09em;
+  }
+
+  .light-caption__band {
+    grid-template-columns: 1fr;
+  }
+
+  .light-caption__intro {
+    gap: 5px;
+    padding: 17px 20px 13px;
+    border-right: 0;
+    border-bottom: 1px solid var(--lc-rule);
+  }
+
+  .light-caption__profiles {
+    min-height: 108px;
+  }
+
+  .light-caption__person {
+    gap: 8px;
+    padding: 17px 13px;
+  }
+
+  .light-caption__identity h2 {
+    font-size: clamp(17px, 5vw, 25px);
+  }
+
+  .light-caption__identity p {
+    font-size: 8px;
+    letter-spacing: .055em;
+  }
+
+  .light-caption__tail {
+    font-size: 8px;
+    letter-spacing: .08em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .light-caption__masthead,
+  .light-caption__figure {
+    animation: none;
+  }
+}

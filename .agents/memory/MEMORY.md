@@ -1,0 +1,12 @@
+- [Browser contrast values](browser-contrast-values.md) — Chromium computed styles may use modern color syntax and shorthand values; parse rendered longhands explicitly.
+- [Selected Work visibility and focus](selected-work-visibility.md) — keep card visibility React-owned and separate restored focus from hover decoration.
+- [Selected Work row checks](selected-work-row-checks.md) — compare grid offset placement separately from intentional hover/focus transforms.
+- [Browser check cleanup](browser-check-cleanup.md) — headless Chromium checks can pass assertions before a temporary-profile cleanup race.
+- [Header logo sizing](header-logo-sizing.md) — supplied PNGs have transparent padding, so size the image bounds for visible-mark clarity.
+- [Browser focus-visible checks](browser-focus-visible-checks.md) — verify keyboard-only states with real Tab input, not synthetic `.focus()` calls.
+- [Light-mode work labels](light-mode-work-labels.md) — use an opaque pale-lavender silhouette with dark violet text; translucent overlays were rejected for readability.
+- [Origin-based overlays](origin-based-overlays.md) — card previews should center while expanding from the clicked card and close immediately on backdrop pointer-down.
+- [GitHub connector publishing](github-connector-publishing.md) — when HTTPS git auth is unavailable, publish the verified tree through the connected GitHub API.
+- [Contact route parity](contact-route-parity.md) — Vercel serverless routes do not serve Replit's local API preview; keep both entry points on one handler.
+- [Footer logo flex sizing](footer-logo-flex-sizing.md) — constrain logo-brand flex basis so intrinsic image width can't squeeze the footer links grid.
+- [Hero client logo alignment](hero-client-logo-alignment.md) — hero-only alpha-trimmed copies center visible artwork without changing shared client logos.

@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --ink: #171329;
+  --dark: #ffffff;
+  --violet: #7650df;
+  --violet-deep: #5b38bc;
+  --paper: #fbfaff;
+  --line: rgba(82, 54, 164, .18);
+  --muted: #716b86;
+  --surface: #f2effa;
+  --surface-raised: #e9e2ff;
+  --lavender: #6942cf;
+  --button-ink: #ffffff;
+  --hero-bg: #fbfaff;
+  --hero-text: #171329;
+  --hero-overlay: linear-gradient(90deg, rgba(255,255,255,.96) 0%, rgba(250,248,255,.78) 47%, rgba(225,215,255,.24) 100%);
+  --hero-media: radial-gradient(circle at 76% 32%, #cfc3f2 0, #e7e2f7 25%, #f8f6ff 56%, #ffffff 100%);
+  --hero-fallback: rgba(82, 55, 153, .09);
+  --hero-video-opacity: .52;
+  --section-dark-bg: radial-gradient(circle at 18% 16%, rgba(111,76,210,.12), transparent 30%), linear-gradient(135deg, #f6f3ff, #ffffff 72%);
+  --section-text: var(--ink);
+  --card-bg: #f1edff;
+  --card-text: var(--ink);
+  --card-border: rgba(91, 56, 188, .18);
+  --surface-section: var(--section-dark-bg);
+  --surface-section-text: var(--section-text);
+  --surface-card: var(--card-bg);
+  --surface-card-text: var(--card-text);
+  --surface-card-border: var(--card-border);
+  --surface-card-hover: linear-gradient(135deg, color-mix(in srgb, var(--violet) 22%, transparent), color-mix(in srgb, var(--surface-raised) 72%, transparent));
+  --surface-hover-border: color-mix(in srgb, var(--violet) 24%, transparent);
+  --surface-hover-shadow: 0 14px 28px color-mix(in srgb, var(--violet-deep) 22%, transparent);
+  --surface-raised-border: color-mix(in srgb, var(--violet) 22%, transparent);
+  --surface-raised-shadow: 0 14px 30px color-mix(in srgb, var(--violet-deep) 18%, transparent);
+  --case-bg: linear-gradient(135deg, #f0ebff, #ffffff);
+  --contact-bg: radial-gradient(circle at 15% 20%, rgba(124,89,224,.16), transparent 35%), linear-gradient(120deg, #f1edff, #ffffff 68%);
+  --footer-bg: #f1edff;
+  --footer-text: var(--ink);
+  --control-border: rgba(35, 24, 66, .25);
+  --control-muted: rgba(35, 24, 66, .68);
+  --art-01: linear-gradient(135deg, #5a3bab, #9474e9);
+  --art-02: linear-gradient(140deg, #4a4f9b, #8173d2);
+  --art-03: linear-gradient(135deg, #70428d, #b194ed);
+  --art-04: linear-gradient(135deg, #435a9b, #7485cf);
+  --art-05: linear-gradient(135deg, #5841a3, #aa91f5);
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Sora', sans-serif;
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+  --motion-fast: 180ms;
+  --motion-base: 650ms;
+  --container-gutter: clamp(20px, 4vw, 48px);
+  --section-y: clamp(76px, 8vw, 120px);
+  --section-head-gap: clamp(34px, 4vw, 58px);
+  --grid-gap: clamp(14px, 1.8vw, 22px);
+}
+
+[data-theme='dark'] {
+  --ink: #f5f2ff;
+  --dark: #08091d;
+  --violet: #936dff;
+  --violet-deep: #7047e8;
+  --paper: #0d0d28;
+  --line: rgba(169, 153, 255, .2);
+  --muted: #aaa5c6;
+  --surface: #15133b;
+  --surface-raised: #1c1850;
+  --lavender: #c8b8ff;
+  --button-ink: #08091d;
+  --hero-bg: #08091d;
+  --hero-text: #ffffff;
+  --hero-overlay: linear-gradient(90deg, rgba(5,6,22,.96) 0%, rgba(9,8,34,.72) 47%, rgba(24,15,65,.44) 100%);
+  --hero-media: radial-gradient(circle at 76% 32%, #4d38a7 0, #211b50 24%, #10102f 56%, #08091d 100%);
+  --hero-fallback: rgba(255,255,255,.13);
+  --section-dark-bg: radial-gradient(circle at 18% 16%, rgba(68,47,159,.18), transparent 30%), linear-gradient(135deg, #111134, #08091d 72%);
+  --section-text: #ffffff;
+  --card-bg: #171643;
+  --card-text: #ffffff;
+  --card-border: rgba(164,143,255,.15);
+  --surface-section: var(--section-dark-bg);
+  --surface-section-text: var(--section-text);
+  --surface-card: var(--card-bg);
+  --surface-card-text: var(--card-text);
+  --surface-card-border: var(--card-border);
+  --surface-card-hover: linear-gradient(135deg, color-mix(in srgb, var(--violet) 22%, transparent), color-mix(in srgb, var(--surface-raised) 72%, transparent));
+  --surface-hover-border: color-mix(in srgb, var(--violet) 24%, transparent);
+  --surface-hover-shadow: 0 14px 28px color-mix(in srgb, var(--violet-deep) 22%, transparent);
+  --surface-raised-border: color-mix(in srgb, var(--violet) 22%, transparent);
+  --surface-raised-shadow: 0 14px 30px color-mix(in srgb, var(--violet-deep) 18%, transparent);
+  --case-bg: linear-gradient(135deg, #1c184a, #0e0e2a);
+  --contact-bg: radial-gradient(circle at 15% 20%, rgba(73,51,171,.28), transparent 35%), linear-gradient(120deg, #0c0d2b, #08091d 68%);
+  --footer-bg: #060717;
+  --footer-text: #ffffff;
+  --control-border: rgba(255,255,255,.24);
+  --control-muted: rgba(255,255,255,.7);
+  --art-01: linear-gradient(135deg, #3b237f, #7655d7);
+  --art-02: linear-gradient(140deg, #1a2355, #6252b4);
+  --art-03: linear-gradient(135deg, #4d286d, #a178e9);
+  --art-04: linear-gradient(135deg, #101b46, #4158a5);
+  --art-05: linear-gradient(135deg, #302071, #9b7aff);
+}
+
+.fw-people-preview {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.fw-people-preview *,
+.fw-people-preview *::before,
+.fw-people-preview *::after {
+  box-sizing: border-box;
+}
+
+.fw-people-preview .fw-dark-section {
+  padding: var(--section-y) 0;
+  background: var(--surface-section);
+  color: var(--surface-section-text);
+}
+
+.fw-people-preview .fw-container {
+  width: min(1240px, calc(100% - (2 * var(--container-gutter))));
+  margin-inline: auto;
+}
+
+.fw-people-preview .fw-people h2 {
+  margin: 12px 0 clamp(30px, 4.5vw, 56px);
+  font: 600 clamp(42px, 6vw, 80px)/.9 var(--display);
+  letter-spacing: -.09em;
+}
+
+.fw-people-preview .fw-people h2 em {
+  color: var(--lavender);
+  font-style: normal;
+}
+
+.fw-people-preview .fw-people-team {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
+.fw-people-preview .fw-people-photo-wrap {
+  margin: 0;
+}
+
+.fw-people-preview .fw-people-photo {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--section-text) 18%, transparent);
+  background: var(--surface);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--dark) 30%, transparent);
+}
+
+.fw-people-preview .fw-people-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fw-people-preview .fw-people-profiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 3vw, 42px);
+  margin-top: clamp(18px, 2.4vw, 30px);
+}
+
+.fw-people-preview .fw-person {
+  min-width: 0;
+  padding-top: clamp(13px, 1.6vw, 20px);
+  border-top: 1px solid color-mix(in srgb, var(--section-text) 26%, transparent);
+  color: var(--section-text);
+  text-align: left;
+}
+
+.fw-people-preview .fw-person-right {
+  text-align: right;
+}
+
+.fw-people-preview .fw-person h3 {
+  margin: 0;
+  color: var(--section-text);
+  font: 600 clamp(21px, 3vw, 34px)/1.04 var(--display);
+  letter-spacing: -.05em;
+  overflow-wrap: anywhere;
+}
+
+.fw-people-preview .fw-person p {
+  margin: 8px 0 0;
+  color: var(--lavender);
+  font-size: clamp(10px, 1vw, 12px);
+  font-weight: 600;
+  letter-spacing: .08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.fw-people-preview .fw-people-photo-wrap--editorial {
+  position: relative;
+  isolation: isolate;
+  margin-bottom: 16px;
+}
+
+.fw-people-preview .fw-people-photo-wrap--editorial::before {
+  position: absolute;
+  z-index: 0;
+  inset: 15px 0 0 15px;
+  border: 1px solid color-mix(in srgb, var(--lavender) 55%, transparent);
+  background: radial-gradient(
+    circle at 100% 100%,
+    color-mix(in srgb, var(--violet) 26%, transparent),
+    transparent 65%
+  );
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--violet-deep) 16%, transparent);
+  content: '';
+  pointer-events: none;
+}
+
+.fw-people-preview .fw-people-photo-wrap--editorial .fw-people-photo {
+  position: relative;
+  z-index: 1;
+  margin: 0 15px 15px 0;
+}
+
+@media (max-width: 650px) {
+  .fw-people-preview .fw-people h2 {
+    margin-bottom: 34px;
+  }
+
+  .fw-people-preview .fw-person h3 {
+    font-size: clamp(18px, 5.2vw, 22px);
+  }
+
+  .fw-people-preview .fw-person p {
+    font-size: 9px;
+    letter-spacing: .05em;
+  }
+}
