@@ -154,6 +154,10 @@ async function measureGrid(cdp) {
       gridColumns: style?.gridTemplateColumns ?? '',
       gap: style?.rowGap ?? '',
       columnGap: style?.columnGap ?? '',
+      categories: Array.from(document.querySelectorAll('.fw-work-category'), (button) => button.dataset.workCategory ?? ''),
+      activeCategory: document.querySelector('.fw-work-category[aria-pressed="true"]')?.dataset.workCategory ?? '',
+      workCount: document.querySelector('.fw-work-count')?.textContent.trim() ?? '',
+      emptyStateText: document.querySelector('.fw-work-empty')?.textContent.trim() ?? '',
       cards: cards.map((card, index) => {
         const cardStyle = getComputedStyle(card);
         const rect = card.getBoundingClientRect();
@@ -164,6 +168,7 @@ async function measureGrid(cdp) {
           offsetTop: card.offsetTop,
           offsetLeft: card.offsetLeft,
           offsetHeight: card.offsetHeight,
+          offsetWidth: card.offsetWidth,
           rectTop: rect.top,
           rectLeft: rect.left,
           orientation: card.classList.contains('fw-work-film-card--landscape') ? 'landscape' : 'portrait',
@@ -186,9 +191,25 @@ function assertGrid(
 ) {
   const errors = [];
   const cards = measurement.cards;
+  const usesCompactReelLayout = ['Personal brand', 'Artist'].includes(measurement.activeCategory);
 
-  if (cards.length !== 3) {
-    errors.push(`expected 3 video cards, found ${cards.length}`);
+  const expectedCategories = ['Corporate', 'Hospitality', 'Personal brand', 'Artist'];
+  if (measurement.categories.join('|') !== expectedCategories.join('|')) {
+    errors.push(`categories are ${measurement.categories.join(', ')}, not ${expectedCategories.join(', ')}`);
+  }
+  if (!expectedCategories.includes(measurement.activeCategory)) {
+    errors.push(`active category is ${measurement.activeCategory || 'missing'}`);
+  }
+  if (measurement.workCount !== `${String(cards.length).padStart(2, '0')} FILMS`) {
+    errors.push(`film count is ${measurement.workCount || 'missing'} for ${cards.length} visible cards`);
+  }
+  if (cards.length === 0
+    && (!measurement.emptyStateText.toLowerCase().includes('no videos')
+      || !measurement.emptyStateText.includes(measurement.activeCategory))) {
+    errors.push('empty category does not show its category name and a no-videos message');
+  }
+  if (cards.length > 0 && measurement.emptyStateText) {
+    errors.push('empty-state message is visible while film cards are present');
   }
 
   const invalidFilmCards = cards.filter((card) =>
@@ -224,11 +245,6 @@ function assertGrid(
       errors.push(`row at offsetTop ${rowTop} is not aligned`);
     }
   }
-  const orientations = cards.map((card) => card.orientation);
-  if (orientations.join('|') !== 'landscape|portrait|portrait') {
-    errors.push(`video order is ${orientations.join(', ')}, not landscape then two portraits`);
-  }
-
   if (viewport.width <= 650) {
     if (measurement.gridColumns.trim().split(/\\s+/).length !== 1) {
       errors.push(`mobile grid has ${measurement.gridColumns} instead of one column`);
@@ -243,36 +259,37 @@ function assertGrid(
         errors.push(`mobile card ${index + 1} does not preserve the ${rowGap}px single-column gap`);
       }
     }
-  } else if (cards.length > 1) {
-    const rowSizes = [...rows.values()].map((row) => row.length);
-    if (rowSizes.some((size) => size > 3)) {
-      errors.push(`desktop/tablet row contains ${Math.max(...rowSizes)} cards`);
+  } else {
+    const expectedColumns = usesCompactReelLayout ? 3 : 2;
+    if (measurement.gridColumns.trim().split(/\s+/).length !== expectedColumns) {
+      errors.push(`desktop/tablet grid has ${measurement.gridColumns} instead of ${expectedColumns} columns`);
     }
-    if (rowSizes.length !== 2 || rowSizes[0] !== 1 || rowSizes[1] !== 2) {
-      errors.push(`desktop/tablet rows have ${rowSizes.join(',')} cards instead of 1 above 2`);
-    } else {
-      const [landscape] = [...rows.values()][0];
-      const [leftPortrait, rightPortrait] = [...rows.values()][1];
-      const rowGap = Number.parseFloat(measurement.gap);
-      const columnGap = Number.parseFloat(measurement.columnGap);
-      const expectedPortraitTop = landscape.offsetTop + landscape.offsetHeight + rowGap;
-      const expectedRightLeft = leftPortrait.offsetLeft + leftPortrait.offsetWidth + columnGap;
-
-      if (Math.abs(leftPortrait.offsetTop - expectedPortraitTop) > 1
-        || Math.abs(rightPortrait.offsetTop - expectedPortraitTop) > 1) {
-        errors.push('two portrait cards do not align directly below the landscape card');
+    for (const row of rows.values()) {
+      if (row.length > expectedColumns) {
+        errors.push(`desktop/tablet row contains ${row.length} cards`);
       }
-      if (Math.abs(leftPortrait.offsetTop - rightPortrait.offsetTop) > 1
-        || Math.abs(leftPortrait.offsetHeight - rightPortrait.offsetHeight) > 1) {
-        errors.push('portrait cards do not share an aligned row and equal height');
+      if (row.some((card) => card.orientation === 'landscape') && row.length !== 1) {
+        errors.push('landscape cards must occupy their own row');
       }
-      if (landscape.offsetLeft !== leftPortrait.offsetLeft
-        || Math.abs(rightPortrait.offsetLeft - expectedRightLeft) > 2) {
-        errors.push('landscape and portrait cards do not follow the shared grid columns');
+      if (row.length > 1) {
+        const orderedRow = [...row].sort((left, right) => left.offsetLeft - right.offsetLeft);
+        if (orderedRow.some((card) => card.orientation !== 'portrait')) {
+          errors.push('only portrait cards may share a desktop/tablet row');
+        }
+        for (let index = 1; index < orderedRow.length; index += 1) {
+          const previousCard = orderedRow[index - 1];
+          const currentCard = orderedRow[index];
+          const expectedLeft = previousCard.offsetLeft
+            + previousCard.offsetWidth
+            + Number.parseFloat(measurement.columnGap);
+          if (Math.abs(previousCard.offsetTop - currentCard.offsetTop) > 1
+            || Math.abs(previousCard.offsetHeight - currentCard.offsetHeight) > 1
+            || Math.abs(currentCard.offsetLeft - expectedLeft) > 2) {
+            errors.push('portrait cards do not align within the shared grid columns');
+          }
+        }
       }
-    }
-    if (checkRenderedTops) {
-      for (const row of rows.values()) {
+      if (checkRenderedTops) {
         const rectTops = row.map((card) => card.rectTop);
         if (Math.max(...rectTops) - Math.min(...rectTops) > 1) {
           errors.push('desktop/tablet cards in a row have different rendered tops');
@@ -281,9 +298,87 @@ function assertGrid(
     }
   }
 
+  if (usesCompactReelLayout
+    && (cards.length !== 4
+      || cards.slice(0, 3).some((card) => card.orientation !== 'portrait')
+      || cards[3]?.orientation !== 'landscape')) {
+    errors.push('Personal brand and Artist must show three portrait reels before the landscape film');
+  }
+
+  if (usesCompactReelLayout && viewport.width > 650
+    && cards.slice(0, 3).some((card) => card.offsetWidth > 281)) {
+    errors.push('compact-category portrait reels exceed the 280px card width');
+  }
+
+  if (usesCompactReelLayout && viewport.width > 650) {
+    const rowSizes = Array.from(rows.values(), (row) => row.length);
+    if (rowSizes[0] !== 3 || rowSizes[1] !== 1) {
+      errors.push('compact-category grid must place three portrait reels together, then the landscape film');
+    }
+  }
+
   if (errors.length > 0) {
     throw new Error(`${viewport.name} / ${filter}: ${errors.join('; ')}`);
   }
+}
+
+async function assertWorkCategories(cdp, viewport) {
+  const expectedCategories = ['Corporate', 'Hospitality', 'Personal brand', 'Artist'];
+  const categories = await evaluate(cdp, `
+    return Array.from(document.querySelectorAll('.fw-work-category'), (button) => button.dataset.workCategory ?? '');
+  `);
+  if (categories.join('|') !== expectedCategories.join('|')) {
+    throw new Error(`${viewport.name}: category controls are ${categories.join(', ')}`);
+  }
+
+  let firstCategoryWithFilms = null;
+  for (const category of expectedCategories) {
+    await evaluate(cdp, `
+      const category = ${JSON.stringify(category)};
+      const button = Array.from(document.querySelectorAll('.fw-work-category'))
+        .find((item) => item.dataset.workCategory === category);
+      if (!button) throw new Error('Missing category button: ' + category);
+      button.click();
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return true;
+    `);
+    const state = await evaluate(cdp, `
+      return {
+        active: document.querySelector('.fw-work-category[aria-pressed="true"]')?.dataset.workCategory ?? '',
+        selectedCount: document.querySelectorAll('.fw-work-category[aria-pressed="true"]').length,
+        count: document.querySelector('.fw-work-count')?.textContent.trim() ?? '',
+        cards: document.querySelectorAll('#work .fw-projects .fw-project-card').length,
+        emptyText: document.querySelector('.fw-work-empty')?.textContent.trim() ?? '',
+      };
+    `);
+
+    if (state.active !== category || state.selectedCount !== 1) {
+      throw new Error(`${viewport.name}: selecting ${category} did not update the active category`);
+    }
+    if (state.count !== `${String(state.cards).padStart(2, '0')} FILMS`) {
+      throw new Error(`${viewport.name}: ${category} count does not match its visible films`);
+    }
+    if (state.cards === 0) {
+      if (!state.emptyText.toLowerCase().includes('no videos') || !state.emptyText.includes(category)) {
+        throw new Error(`${viewport.name}: ${category} does not show the expected empty state`);
+      }
+    } else {
+      if (state.emptyText) throw new Error(`${viewport.name}: ${category} shows an empty state with films`);
+      assertGrid(viewport, category, await measureGrid(cdp));
+      firstCategoryWithFilms ??= category;
+    }
+  }
+
+  const restoreCategory = firstCategoryWithFilms ?? expectedCategories[0];
+  await evaluate(cdp, `
+    const category = ${JSON.stringify(restoreCategory)};
+    const button = Array.from(document.querySelectorAll('.fw-work-category'))
+      .find((item) => item.dataset.workCategory === category);
+    button?.click();
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return true;
+  `);
+  return firstCategoryWithFilms;
 }
 
 async function measureMobileFooter(cdp) {
@@ -369,10 +464,9 @@ function assertHomepageFinishes(viewport, measurement) {
     throw new Error(`${viewport.name}: desktop footer links are too narrow `
       + `(${measurement.footerLinksWidth}px, columns ${measurement.footerLinkColumnWidths.join(', ')}px)`);
   }
-  if (measurement.collaborationColor !== 'rgb(32, 26, 54)'
-    || !measurement.collaborationBackground.includes('rgb(247, 245, 255)')
-    || !measurement.collaborationBackground.includes('rgb(240, 237, 255)')) {
-    throw new Error(`${viewport.name}: People We've Created With is missing its themed lavender surface`);
+  if (!measurement.collaborationColor
+    || !measurement.collaborationBackground.includes('gradient')) {
+    throw new Error(`${viewport.name}: People We've Created With is missing its themed gradient surface`);
   }
   if (!(measurement.haloZIndex < measurement.bulbZIndex)) {
     throw new Error(`${viewport.name}: bulb glow is not layered behind the bulb artwork`);
@@ -591,19 +685,20 @@ async function checkViewport(viewport) {
     });
     await cdp.send('Page.navigate', { url: baseUrl });
     await waitForWorkGrid(cdp);
-    if (viewport.name === 'desktop') {
-      await assertReducedMotionPlayback(cdp);
-    }
+    await assertWorkCategories(cdp, viewport);
 
     const measurement = await measureGrid(cdp);
     assertGrid(viewport, 'selected work', measurement);
     assertMobileFooter(viewport, await measureMobileFooter(cdp));
     assertHomepageFinishes(viewport, await measureHomepageFinishes(cdp));
-    if (viewport.width > 650) {
+    if (measurement.cards.length > 0 && viewport.name === 'desktop') {
+      await assertReducedMotionPlayback(cdp);
+    }
+    if (measurement.cards.length > 0 && viewport.width > 650) {
       await assertInteractions(cdp, viewport);
     }
 
-    console.log(`✓ ${viewport.name}: video cards and ${viewport.width > 650 ? 'preview interactions' : 'mobile spacing'} verified`);
+    console.log(`✓ ${viewport.name}: ${measurement.cards.length > 0 ? 'category films' : 'four categories and empty states'} verified`);
     cdp.close();
   } finally {
     if (!browserExited) browser.kill('SIGTERM');

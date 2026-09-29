@@ -9,7 +9,7 @@ import whiteLogo from '@assets/FWM_WHITE_LOGO_1789527084870.png';
 import teamPhoto from '@assets/Timeline_1_01_00_14_17_(1)_1790539728272.png';
 import heroIconLogo from './assets/fwm-hero-icon.png';
 import { creators } from './content/creators';
-import { clientLogos, services, workFilms, type WorkFilm } from './content/site-content';
+import { clientLogos, services, workCategories, workFilms, type WorkCategory, type WorkFilm } from './content/site-content';
 import { WhoWeAre } from '@/components/who-we-are';
 import NotFound from '@/pages/not-found';
 
@@ -537,6 +537,7 @@ function Home() {
   const [theme, setTheme] = useState<Theme>(getStoredTheme);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeFilm, setActiveFilm] = useState<WorkFilm | null>(null);
+  const [activeWorkCategory, setActiveWorkCategory] = useState<WorkCategory>(workCategories[0]);
   const [caseStudyOrigin, setCaseStudyOrigin] = useState<OverlayOrigin>({ x: 0, y: 0 });
   const [collabTab, setCollabTab] = useState<CollaborationTab>('BRANDS');
   const [isCollabMotionPaused, setIsCollabMotionPaused] = useState(false);
@@ -546,6 +547,8 @@ function Home() {
   const isSubmittingRef = useRef(false);
   const caseStudyRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const filteredWorkFilms = workFilms.filter((film) => film.category === activeWorkCategory);
+  const usesCompactReelLayout = activeWorkCategory === 'Personal brand' || activeWorkCategory === 'Artist';
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
@@ -770,12 +773,29 @@ function Home() {
             <p>A selection of films, campaigns, brand identities, social content and creative projects we&apos;ve built for brands, businesses and organisations.</p>
           </div>
            <div className="fw-work-intro fw-reveal" data-reveal-delay="1">
-             <span className="fw-work-count">{String(workFilms.length).padStart(2, '0')} FILMS</span>
+              <span className="fw-work-count">{String(filteredWorkFilms.length).padStart(2, '0')} FILMS</span>
             <a className="fw-work-contact-cta" href="#contact">HAVE A PROJECT IN MIND? <span>→ LET&apos;S TALK</span></a>
           </div>
+           <div className="fw-work-categories fw-filters fw-reveal" role="group" aria-label="Filter selected work by category" data-reveal-delay="2">
+             {workCategories.map((category) => (
+               <button
+                 key={category}
+                 className={`fw-filter fw-work-category ${activeWorkCategory === category ? 'active' : ''}`}
+                 type="button"
+                 data-work-category={category}
+                 aria-pressed={activeWorkCategory === category}
+                 onClick={() => setActiveWorkCategory(category)}
+               >
+                 {category}
+               </button>
+             ))}
+           </div>
            <div className="fw-work-stage" onClick={(event) => { if (event.target === event.currentTarget) closePreview(); }}>
-            <div className="fw-projects">
-               {workFilms.map((film, index) => (
+              <div
+                className={`fw-projects ${usesCompactReelLayout ? 'fw-projects--compact-reels' : ''}`}
+                aria-live="polite"
+              >
+                {filteredWorkFilms.length > 0 ? filteredWorkFilms.map((film, index) => (
                  <WorkFilmCard
                    key={film.id}
                    film={film}
@@ -783,7 +803,12 @@ function Home() {
                    isActive={activeFilm?.id === film.id}
                    onOpen={openPreview}
                  />
-               ))}
+                )) : (
+                  <div className="fw-work-empty" role="status">
+                    <span>{activeWorkCategory}</span>
+                    <p>No videos in this category yet.</p>
+                  </div>
+                )}
             </div>
           </div>
              {activeFilm && (

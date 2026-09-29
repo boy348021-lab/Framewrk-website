@@ -441,14 +441,46 @@ async function evaluateContrast(cdp) {
         addStyleCheck('mobile navigation CTA text on violet', '.fw-mobile-nav a:last-child', 'color', '--violet', 4.5);
       }
 
+      const expectedWorkCategories = ['Corporate', 'Hospitality', 'Personal brand', 'Artist'];
+      const workCategoryButtons = [...document.querySelectorAll('.fw-work-category')];
+      const workCategoryLabels = workCategoryButtons.map((button) => button.dataset.workCategory ?? '');
+      const activeWorkCategory = document.querySelector('.fw-work-category[aria-pressed="true"]');
+      const validWorkCategories = workCategoryLabels.join('|') === expectedWorkCategories.join('|')
+        && workCategoryButtons.filter((button) => button.getAttribute('aria-pressed') === 'true').length === 1;
+      checks.push({
+        label: 'selected work category controls',
+        passed: validWorkCategories,
+        details: validWorkCategories
+          ? 'four named categories with one selected button'
+          : 'missing categories or invalid selected-button state',
+      });
+      if (workCategoryButtons.length > 0) {
+        addStyleCheck('inactive work category text on dark section', '.fw-work-category:not(.active)', 'color', '--surface', 4.5);
+        addStyleCheck('active work category text on lavender', '.fw-work-category.active', 'color', '--lavender', 4.5);
+      }
+
       // Work cards pair an autoplaying preview with a loaded poster and visible caption.
       const projectCards = [...document.querySelectorAll('.fw-project-card')];
       if (projectCards.length === 0) {
+        const emptyState = document.querySelector('.fw-work-empty');
+        const emptyText = emptyState?.textContent.trim() ?? '';
+        const count = document.querySelector('.fw-work-count')?.textContent.trim() ?? '';
+        const validEmptyState = Boolean(
+          emptyState?.getAttribute('role') === 'status'
+          && activeWorkCategory?.dataset.workCategory
+          && emptyText.toLowerCase().includes('no videos')
+          && emptyText.includes(activeWorkCategory.dataset.workCategory)
+          && count === '00 FILMS'
+        );
         checks.push({
-          label: 'work video-card fixture',
-          passed: false,
-          details: 'no selected-work video cards rendered',
+          label: 'selected work empty state',
+          passed: validEmptyState,
+          details: validEmptyState
+            ? 'accessible no-videos status identifies the active category'
+            : 'missing accessible status, category name, or zero-film count',
         });
+        addStyleCheck('empty-state category label on dark section', '.fw-work-empty > span', 'color', '--surface', 4.5);
+        addStyleCheck('empty-state message on dark section', '.fw-work-empty > p', 'color', '--surface', 4.5);
       } else {
         projectCards.forEach((card, cardIndex) => {
           const video = card.querySelector('video');
