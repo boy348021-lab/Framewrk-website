@@ -92,7 +92,7 @@ export const workFilms: WorkFilm[] = [
     client: 'EthElite',
     description: "A recap of India's Web3 and AI gala.",
     orientation: 'landscape',
-    video: workFilmAsset('mm-aftermovie.mp4'),
+    video: workFilmAsset('mm-aftermovie-web.mp4'),
     poster: workFilmAsset('mm-aftermovie.jpg'),
   },
   {
@@ -102,7 +102,7 @@ export const workFilms: WorkFilm[] = [
     client: 'European Union',
     description: 'A portrait event film featuring the Europe Day 2026 program.',
     orientation: 'portrait',
-    video: workFilmAsset('europe-day-2026.mp4'),
+    video: workFilmAsset('europe-day-2026-web.mp4'),
     poster: workFilmAsset('europe-day-2026.jpg'),
   },
   {
@@ -132,7 +132,7 @@ export const workFilms: WorkFilm[] = [
     client: 'Hilton',
     description: 'A hospitality film featuring guest experiences and amenities.',
     orientation: 'landscape',
-    video: workFilmAsset('hilton-garden-inn.mp4'),
+    video: workFilmAsset('hilton-garden-inn-web.mp4'),
     poster: workFilmAsset('hilton-garden-inn.jpg'),
   },
   {
