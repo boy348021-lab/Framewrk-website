@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const checks = [
+  { name: 'work-film assets', script: 'check-work-film-assets.mjs' },
   { name: 'header actions', script: 'check-header-actions.mjs' },
   { name: 'hero rendering', script: 'check-hero-mark.mjs' },
   { name: 'reduced motion', script: 'check-reduced-motion.mjs' },
