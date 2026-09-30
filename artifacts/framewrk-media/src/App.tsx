@@ -1,9 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { ArrowRight, ArrowUp, ArrowUpRight, Menu, Pause, Play, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, ArrowUpRight, Mail, Menu, MessageCircle, Pause, Play, X } from 'lucide-react';
 import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
 import whiteLogo from '@assets/FWM_WHITE_LOGO_1789527084870.png';
 import teamPhoto from '@assets/Timeline_1_01_00_14_17_(1)_1790539728272.png';
@@ -452,7 +452,7 @@ function CollaborationLogoMarquee({
           >
             {clients.map((client) => (
               <figure
-                className="fw-collab-item"
+                className={`fw-collab-item ${client.name === 'BMW' ? 'fw-collab-item--roundel' : ''}`}
                 key={client.id}
                 role={isDuplicate ? undefined : 'listitem'}
               >
@@ -541,10 +541,6 @@ function Home() {
   const [caseStudyOrigin, setCaseStudyOrigin] = useState<OverlayOrigin>({ x: 0, y: 0 });
   const [collabTab, setCollabTab] = useState<CollaborationTab>('BRANDS');
   const [isCollabMotionPaused, setIsCollabMotionPaused] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const isSubmittingRef = useRef(false);
   const caseStudyRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const filteredWorkFilms = workFilms.filter((film) => film.category === activeWorkCategory);
@@ -674,50 +670,6 @@ function Home() {
     if (trigger?.isConnected) {
       trigger.dataset.focusRestored = 'true';
       trigger.focus({ preventScroll: true });
-    }
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (isSubmittingRef.current) return;
-
-    isSubmittingRef.current = true;
-    setIsSubmitting(true);
-    setSubmitError(null);
-
-    const formData = new FormData(event.currentTarget);
-    const enquiry = {
-      name: String(formData.get('name') ?? ''),
-      company: String(formData.get('company') ?? ''),
-      email: String(formData.get('email') ?? ''),
-      phone: String(formData.get('phone') ?? ''),
-      message: String(formData.get('message') ?? ''),
-      faxNumber: String(formData.get('faxNumber') ?? ''),
-    };
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(enquiry),
-      });
-      const result = await response.json().catch(() => null) as { ok?: boolean; error?: string } | null;
-
-      if (response.status === 503 && result?.error === 'Email delivery is not configured yet.') {
-        setSubmitError('Online enquiries aren’t set up yet. Your details are still here.');
-        return;
-      }
-
-      if (!response.ok || result?.ok !== true) {
-        throw new Error('Contact form submission failed');
-      }
-
-      setSubmitted(true);
-    } catch {
-      setSubmitError('We couldn’t send your note just now. Your details are still here—please try again.');
-    } finally {
-      isSubmittingRef.current = false;
-      setIsSubmitting(false);
     }
   }
 
@@ -931,41 +883,36 @@ function Home() {
            <div className="fw-reveal">
              <p className="fw-eyebrow">CONTACT</p>
             <h2>HAVE AN<br /><em>IDEA?</em></h2>
-            <div className="fw-contact-details">
-              <a href="mailto:contact@theframewrkmedia.com">contact@theframewrkmedia.com</a>
-              <a href="tel:+91959904951">+91 9599041951</a>
-              <a href="tel:+917999229700">+91 7999229700</a>
-            </div>
+             <p className="fw-contact-intro-copy">Choose the way you’d like to start a conversation with our team.</p>
           </div>
-           <form className="fw-form fw-reveal" data-reveal-delay="1" onSubmit={handleSubmit} aria-busy={isSubmitting}>
-            {submitted ? (
-              <div className="fw-form-success" role="status" aria-live="polite">
-                <strong>Thanks for reaching out.</strong><br />
-                Your note has been sent to FrameWrk Media. We&apos;ll be in touch soon.
-              </div>
-            ) : <>
-              <div className="fw-field"><label htmlFor="name">YOUR NAME</label><input id="name" name="name" autoComplete="name" maxLength={120} placeholder="Your full name" required /></div>
-              <div className="fw-field"><label htmlFor="company">COMPANY / BRAND (OPTIONAL)</label><input id="company" name="company" autoComplete="organization" maxLength={160} placeholder="Company or brand name" /></div>
-              <div className="fw-form-row">
-                <div className="fw-field"><label htmlFor="email">EMAIL</label><input id="email" name="email" type="email" autoComplete="email" maxLength={320} placeholder="you@example.com" required /></div>
-                <div className="fw-field"><label htmlFor="phone">PHONE (OPTIONAL)</label><input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={80} placeholder="Phone number" /></div>
-              </div>
-              <div className="fw-field"><label htmlFor="message">WHAT CAN WE HELP WITH?</label><textarea id="message" name="message" maxLength={5000} placeholder="Tell us about your project" required /></div>
-              <div className="fw-honeypot" aria-hidden="true">
-                <label htmlFor="faxNumber">Fax number</label>
-                <input id="faxNumber" name="faxNumber" type="text" tabIndex={-1} autoComplete="off" />
-              </div>
-              {submitError && (
-                <div className="fw-form-error" role="alert">
-                  {submitError} <a href="mailto:contact@theframewrkmedia.com">Email us directly</a>.
-                </div>
-              )}
-              <button className="fw-form-submit" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'SENDING…' : 'START THE CONVERSATION'}
-                {!isSubmitting && <ArrowUpRight size={15} />}
-              </button>
-            </>}
-          </form>
+          <div className="fw-contact-actions fw-reveal" data-reveal-delay="1" role="group" aria-label="Contact options">
+            <a
+              className="fw-contact-action"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=contact%40theframewrkmedia.com&su=Project%20Enquiry"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="fw-contact-action__icon" aria-hidden="true"><Mail size={20} /></span>
+              <span className="fw-contact-action__copy">
+                <span>EMAIL VIA GMAIL</span>
+                <strong>contact@theframewrkmedia.com</strong>
+              </span>
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </a>
+            <a
+              className="fw-contact-action"
+              href="https://wa.me/919599041951?text=Hi%20FrameWrk%20Media%2C%20I%27d%20like%20to%20discuss%20a%20project."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="fw-contact-action__icon" aria-hidden="true"><MessageCircle size={20} /></span>
+              <span className="fw-contact-action__copy">
+                <span>CHAT ON WHATSAPP</span>
+                <strong>+91 9599041951</strong>
+              </span>
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </section>
       <footer className="fw-footer">
